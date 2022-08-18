@@ -21,7 +21,7 @@ Math.getPoint = function(pt, deg, len){
 class Game{
     constructor(gameCanvas){
         this.canvas = gameCanvas;
-        this.ctx = this.canvas.getContext('2d'); // 2d 컨텍스트를 저장한다
+        this.ctx = this.canvas.getContext('2d');
         this.scenes = [];
         this.now = 0;
         this.last = 0;
@@ -61,7 +61,7 @@ class Scene {
 
     update(timeDelta){
         this.elapsed += timeDelta;
-        this.children.forEach((child)=>{ child.update(timeDelta); }); // 자녀 객체들의 업데이트를 호출
+        this.children.forEach((child)=>{ child.update(timeDelta); });
     }
 
     render(ctx){
@@ -76,19 +76,35 @@ class GameScene extends Scene {
     constructor(){
         super();
         this.character = new Character();
-        this.character.init();
+        this.background = new Background();
+        this.children.push(this.background);
         this.children.push(this.character);
     }
 
-    update(timeDelta){
+    init(){
+        this.background.init();
+        this.character.init();
+        this.cameraX = 100;
+    }
+
+    update(timeDelta, key){
         super.update(timeDelta);
-        if( this.elapsed > 0.5 && this.character.pivot === null ){
-            this.character.setPivot({x:240, y:0});
+        this.cameraX = Math.max(this.cameraX, this.character.x);
+        this.background.x = this.cameraX - 200;
+        if( key === 32 ){
+            let tx = Math.cos(Math.PI/4) * this.character.y + this.character.x;
+            this.character.setPivot({x:tx, y:0});
         }
+
     }
 
     render(ctx){
+        ctx.save();
+        ctx.fillStyle = "White";
+        ctx.translate(-this.cameraX + 200, 0);
         super.render(ctx);
+        ctx.restore();
+
     }
 }
 class GameObject{
@@ -117,6 +133,13 @@ class Character extends GameObject {
             this.angle = Math.angle({x:this.x, y:this.y}, this.pivot);
             this.accel = (-1.0 * (this.force.x+this.force.y)/this.pLen) * Math.sin(this.angle);
             this.update(0);
+        }else{
+            this.pivot = null;
+            this.pLen = 0;
+            this.position = null;
+            this.angle = 0;
+            this.accel = 0;
+            this.update(0);
         }
     }
 
@@ -129,7 +152,7 @@ class Character extends GameObject {
             let ang = this.angle;
             let ang_vel = (-this.gravity/this.pLen) * Math.sin(ang);
             this.accel += ang_vel * timeDelta;
-            this.accel *= 1;
+            this.accel *= 0.9999999;
             ang += this.accel;
             this.angle = ang;
 
@@ -152,6 +175,25 @@ class Character extends GameObject {
         ctx.restore();
     }
 }
+
+class Background extends GameObject{
+    constructor(){
+        super();
+        let imageUrls = ["./image/background.png"];
+        this.images = [];
+        this.images = imageUrls.map((v)=>{ let img = new Image(); img.src = v; return img; });
+    }
+    init(){
+        this.x = 0;
+    }
+    render(ctx){
+        ctx.save();
+        ctx.translate(this.x, 0);
+        ctx.drawImage(this.images[0], 0, 0);
+        ctx.restore();
+    }
+}
+
 
 const game = new Game(document.getElementById('canvas'));
 game.push(new GameScene());
