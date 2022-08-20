@@ -26,6 +26,12 @@ class Game{
         this.now = 0;
         this.last = 0;
         this.timeDelta = 0;
+        this.click = false;
+        document.addEventListener("click", this.clickCheck.bind(this), false);
+    }
+
+    clickCheck(){
+        this.click = true;
     }
 
     update(){
@@ -35,9 +41,10 @@ class Game{
 
         this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
         if( this.scenes.length > 0){
-            this.scenes.last().update(this.timeDelta);
+            this.scenes.last().update(this.timeDelta, this.click);
             this.scenes.last().render(this.ctx);
         }
+        this.click = false;
         requestAnimationFrame(this.update.bind(this));
     }
 
@@ -87,15 +94,17 @@ class GameScene extends Scene {
         this.cameraX = 100;
     }
 
-    update(timeDelta, key){
+    update(timeDelta, click){
         super.update(timeDelta);
+        if( this.elapsed < 0.5 && this.character.pivot === null){
+            this.character.setPivot({x:240, y:0});
+        }
         this.cameraX = Math.max(this.cameraX, this.character.x);
         this.background.x = this.cameraX - 200;
-        if( key === 32 ){
+        if( click ){
             let tx = Math.cos(Math.PI/4) * this.character.y + this.character.x;
             this.character.setPivot({x:tx, y:0});
         }
-
     }
 
     render(ctx){
@@ -148,21 +157,25 @@ class Character extends GameObject {
             this.force.y += this.gravity * timeDelta;
             this.x += this.force.x;
             this.y += this.force.y;
-        }else{
+        }else {
             let ang = this.angle;
-            let ang_vel = (-this.gravity/this.pLen) * Math.sin(ang);
+            let ang_vel = (-this.gravity / this.pLen) * Math.sin(ang);
             this.accel += ang_vel * timeDelta;
-            this.accel *= 0.9999999;
+            this.accel *= 1;
             ang += this.accel;
-            this.angle = ang;
+            if (Math.abs(Math.rad2deg(ang)) >= 90) {
+                this.setPivot(null);
+            } else {
+                this.angle = ang;
 
-            this.force.x = this.pLen * this.accel * Math.cos(ang);
-            this.force.y = -this.pLen * this.accel * Math.sin(ang);
+                this.force.x = this.pLen * this.accel * Math.cos(ang);
+                this.force.y = -this.pLen * this.accel * Math.sin(ang);
 
-            this.position.x += this.force.x;
-            this.position.y += this.force.y;
-            this.x = this.position.x + this.pivot.x;
-            this.y = this.position.y + this.pivot.y;
+                this.position.x += this.force.x;
+                this.position.y += this.force.y;
+                this.x = this.position.x + this.pivot.x;
+                this.y = this.position.y + this.pivot.y;
+            }
         }
     }
 
