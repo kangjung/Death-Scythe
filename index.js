@@ -100,7 +100,7 @@ class GameScene extends Scene {
             this.character.setPivot({x:240, y:0});
         }
         this.cameraX = Math.max(this.cameraX, this.character.x);
-        this.background.x = this.cameraX - 200;
+        this.background.x = this.cameraX - 100;
         if( click ){
             let tx = Math.cos(Math.PI/4) * this.character.y + this.character.x;
             this.character.setPivot({x:tx, y:0});
