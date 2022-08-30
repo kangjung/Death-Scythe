@@ -100,7 +100,7 @@ class GameScene extends Scene {
             this.character.setPivot({x:240, y:0});
         }
         this.cameraX = Math.max(this.cameraX, this.character.x);
-        this.background.x = this.cameraX - 100;
+        this.background.x = this.cameraX - 200;
         if( click ){
             let tx = Math.cos(Math.PI/4) * this.character.y + this.character.x;
             this.character.setPivot({x:tx, y:0});
@@ -122,6 +122,12 @@ class GameObject{
     render(ctx){ }
 }
 class Character extends GameObject {
+    constructor(){
+        super();
+        this.img = new Image();
+        this.img.src = "./image/player.png";
+    }
+
     init(){
         this.x = 50;
         this.y = 50;
@@ -185,6 +191,7 @@ class Character extends GameObject {
         ctx.beginPath();
         ctx.arc(0, 0, 30, 0, 5*Math.PI);
         ctx.fill();
+        ctx.drawImage(this.img, 0, 0,64,64);
         ctx.restore();
     }
 }
