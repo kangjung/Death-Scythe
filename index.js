@@ -82,10 +82,16 @@ class Scene {
 class GameScene extends Scene {
     constructor(){
         super();
+        this.cameraX = 100;
+
         this.character = new Character();
         this.background = new Background();
+
         this.children.push(this.background);
         this.children.push(this.character);
+
+        this.children.forEach((ch)=>{ ch.parent = this; });
+
     }
 
     init(){
@@ -95,21 +101,25 @@ class GameScene extends Scene {
     }
 
     update(timeDelta, click){
-        super.update(timeDelta);
-        if( this.elapsed < 0.5 && this.character.pivot === null){
-            this.character.setPivot({x:240, y:0});
+        this.elapsed += timeDelta;
+        this.children.forEach((ch) => {
+            ch.update(timeDelta, this.character);
+        });
+
+        if (this.elapsed < 0.5 && this.character.pivot === null) {
+            this.character.setPivot({x: 240, y: 0});
         }
+
         this.cameraX = Math.max(this.cameraX, this.character.x);
-        this.background.x = this.cameraX - 200;
-        if( click ){
-            let tx = Math.cos(Math.PI/4) * this.character.y + this.character.x;
-            this.character.setPivot({x:tx, y:0});
+
+        if (click) {
+            let tx = Math.cos(Math.PI / 4) * this.character.y + this.character.x;
+            this.character.setPivot({x: tx, y: 0});
         }
     }
 
     render(ctx){
         ctx.save();
-        ctx.fillStyle = "White";
         ctx.translate(-this.cameraX + 200, 0);
         super.render(ctx);
         ctx.restore();
@@ -146,7 +156,7 @@ class Character extends GameObject {
             this.pLen = Math.distance(this, this.pivot);
             this.position = {x:this.x - this.pivot.x, y:this.y - this.pivot.y};
             this.angle = Math.angle({x:this.x, y:this.y}, this.pivot);
-            this.accel = (-1.0 * (this.force.x+this.force.y)/this.pLen) * Math.sin(this.angle);
+            this.accel = (-1.5 * (this.force.x+this.force.y)/this.pLen) * Math.sin(this.angle);
             this.update(0);
         }else{
             this.pivot = null;
@@ -161,13 +171,15 @@ class Character extends GameObject {
     update(timeDelta){
         if(this.pivot === null){
             this.force.y += this.gravity * timeDelta;
+            this.force.x *= 0.99;
             this.x += this.force.x;
             this.y += this.force.y;
+            this.rotation += -360 * timeDelta;
         }else {
             let ang = this.angle;
-            let ang_vel = (-this.gravity / this.pLen) * Math.sin(ang);
+            let ang_vel = (-1 * this.gravity / this.pLen) * Math.sin(ang);
             this.accel += ang_vel * timeDelta;
-            this.accel *= 1;
+            this.accel *= 0.999;
             ang += this.accel;
             if (Math.abs(Math.rad2deg(ang)) >= 90) {
                 this.setPivot(null);
@@ -181,11 +193,23 @@ class Character extends GameObject {
                 this.position.y += this.force.y;
                 this.x = this.position.x + this.pivot.x;
                 this.y = this.position.y + this.pivot.y;
+
+
             }
         }
+        this.magnet = Math.max(0, this.magnet - timeDelta);
     }
 
     render(ctx){
+        ctx.save();
+        if (this.pivot !== null) {
+            ctx.strokeStyle = "red";
+            ctx.beginPath();
+            ctx.moveTo(this.pivot.x, this.pivot.y);
+            ctx.lineTo(this.pivot.x + this.position.x, this.pivot.y + this.position.y);
+            ctx.stroke();
+        }
+        ctx.restore();
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.beginPath();
@@ -199,17 +223,20 @@ class Character extends GameObject {
 class Background extends GameObject{
     constructor(){
         super();
-        let imageUrls = ["./image/background.png"];
+        let imageUrls = ["./image/background.png","./image/background.png","./image/background.png"];
         this.images = [];
         this.images = imageUrls.map((v)=>{ let img = new Image(); img.src = v; return img; });
     }
-    init(){
-        this.x = 0;
-    }
+
     render(ctx){
+        let x = this.parent.cameraX - 200;
+
         ctx.save();
         ctx.translate(this.x, 0);
-        ctx.drawImage(this.images[0], 0, 0);
+        let backgroundX = -(x/3) % 1800;
+        ctx.drawImage(this.images[0], backgroundX, 0);
+        ctx.drawImage(this.images[1], backgroundX + 1800, 0);
+        ctx.drawImage(this.images[2], backgroundX + 3600, 0);
         ctx.restore();
     }
 }
