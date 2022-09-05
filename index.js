@@ -110,12 +110,16 @@ class GameScene extends Scene {
             this.character.setPivot({x: 240, y: 0});
         }
 
-        this.cameraX = Math.max(this.cameraX, this.character.x);
+        this.cameraX = this.character.x;
 
         if (click) {
             let tx = Math.cos(Math.PI / 4) * this.character.y + this.character.x;
             this.character.setPivot({x: tx, y: 0});
         }
+        if(this.cameraX % 1800 === 0){
+            this.background.render(this.ctx);
+        }
+
     }
 
     render(ctx){
@@ -177,9 +181,9 @@ class Character extends GameObject {
             this.rotation += -360 * timeDelta;
         }else {
             let ang = this.angle;
-            let ang_vel = (-1 * this.gravity / this.pLen) * Math.sin(ang);
+            let ang_vel = (-1 * (this.gravity / this.pLen)) * Math.sin(ang);
             this.accel += ang_vel * timeDelta;
-            this.accel *= 0.999;
+            //this.accel *= 0.999;
             ang += this.accel;
             if (Math.abs(Math.rad2deg(ang)) >= 90) {
                 this.setPivot(null);
@@ -228,15 +232,19 @@ class Background extends GameObject{
         this.images = imageUrls.map((v)=>{ let img = new Image(); img.src = v; return img; });
     }
 
+    update(timeDelta) {
+
+
+    }
+
     render(ctx){
         let x = this.parent.cameraX - 200;
 
         ctx.save();
-        ctx.translate(this.x, 0);
-        let backgroundX = -(x/3) % 1800;
+        ctx.translate(x, 0);
+        let backgroundX = -(x/2) % 1800;
         ctx.drawImage(this.images[0], backgroundX, 0);
         ctx.drawImage(this.images[1], backgroundX + 1800, 0);
-        ctx.drawImage(this.images[2], backgroundX + 3600, 0);
         ctx.restore();
     }
 }
