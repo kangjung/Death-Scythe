@@ -31,8 +31,6 @@ class Game{
         this.canvas = gameCanvas;
         this.ctx = this.canvas.getContext('2d');
         this.scenes = [];
-
-        this.state = 0;
         this.now = 0;
         this.last = 0;
         this.timeDelta = 0;
@@ -41,7 +39,6 @@ class Game{
     }
 
     clickCheck(){
-        this.state = 0;
         this.click = true;
     }
 
@@ -49,21 +46,6 @@ class Game{
         this.last = this.now;
         this.now = performance.now();
         this.timeDelta = (this.now-this.last)/1000;
-        if (this.state === 0) {
-            this.ctx.save();
-            this.ctx.fillStyle = "black";
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = "rgba(255,255,255," + Math.sin(this.elapsed * 2) + ")";
-            this.ctx.font = "bold 14px verdana";
-            this.ctx.fillText("loading...", 5, this.canvas.height - 5);
-            this.ctx.restore();
-        } else {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            if (this.scenes.length > 0) {
-                this.scenes.last().update(this.timeDelta, this.click);
-                this.scenes.last().render(this.ctx);
-            }
-        }
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.scenes.length > 0) {
@@ -382,15 +364,11 @@ class UIController extends GameObject {
 class ScoreManager {
     constructor() {
         this.highscore = localStorage.getItem("deathscythescore") || 0;
-        this.gotCoin = 0;
-        this.usedCoin = 0;
         this._score = 0;
     }
 
     reset() {
         this._score = 0;
-        this.gotCoin = 0;
-        this.usedCoin = 0;
     }
 
     save() {
@@ -461,19 +439,6 @@ class Animation {
         this.done = false;
         this.duration = defs.reduce((p, v) => { return p + v.duration; }, 0);
         this.loop = (opt && opt.hasOwnProperty('loop')) ? opt.loop : true;
-    }
-
-    clone() {
-        return new Animation(this.sprites, this.frames);
-    }
-
-    reset() {
-        this.elapsed = 0;
-        this.curFrame = 0;
-    }
-
-    get current() {
-        return this.sprites.get(this.curFrame);
     }
 
     update(timeDelta) {
@@ -618,7 +583,6 @@ class Soul extends Item {
 class SoundManager {
     constructor(){
         this.sounds = {};
-        this.enable = true;
         this.soundFiles = ['jump',  'soul', 'gameover'];
         this.soundFiles.forEach((v)=>{
             this.sounds[v] = document.createElement("audio");
