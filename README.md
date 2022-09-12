@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/28768760/189647385-2d93f8a7-7763-448b-a247-7a47462ba9d0.png)
 
-It's a kind of cross-scroll running.<br/>
+It's a kind of cross-scroll running Game.<br/>
 Move forward while hanging the rope.<br/>
 You need a soul to hang the rope.<br/>
 
