@@ -585,7 +585,7 @@ class Soul extends Item {
 class SoundManager {
     constructor(){
         this.sounds = {};
-        this.soundFiles = ['Jump',  'soul', 'gameover'];
+        this.soundFiles = ['jump',  'soul', 'gameover'];
         this.soundFiles.forEach((v)=>{
             this.sounds[v] = document.createElement("audio");
             this.sounds[v].src = "./sound/" + v + ".mp3";
