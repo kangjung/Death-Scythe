@@ -229,7 +229,7 @@ class Character extends GameObject {
             this.angle = 0;
             this.accel = 0;
             this.update(0);
-            this.force.x *= 3;
+            this.force.x *= 2;
             this.force.y -= 1.5;
             this.sound("jump");
         }
