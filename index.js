@@ -120,6 +120,7 @@ class GameScene extends Scene {
         this.scoreManager.reset();
         this.state = 0;
         this.character.setPivot({x: 300, y: 0});
+        this.soundManager.init();
     }
 
     update(timeDelta, click){
@@ -474,7 +475,7 @@ class ItemManager extends GameObject {
         this.images = [];
         this.images = imageUrls.map((v)=>{ let img = new Image(); img.src = v; return img; });
 
-        this.lastItemX = 0;
+        this.lastItemX = 900;
         this.soulY = 260;
     }
 
@@ -482,7 +483,7 @@ class ItemManager extends GameObject {
         super.init();
         this.items = [];
         this.minX = 0;
-        this.lastItemX = 0;
+        this.lastItemX = 900;
         this.soulY = 260;
     }
 
@@ -580,13 +581,22 @@ class Soul extends Item {
         return "soul";
     }
 }
+
 class SoundManager {
     constructor(){
         this.sounds = {};
-        this.soundFiles = ['jump',  'soul', 'gameover'];
+        this.soundFiles = ['Jump',  'soul', 'gameover'];
         this.soundFiles.forEach((v)=>{
             this.sounds[v] = document.createElement("audio");
             this.sounds[v].src = "./sound/" + v + ".mp3";
+            this.sounds[v].id = v;
+            this.sounds[v].muted = true;
+        });
+    }
+
+    init(){
+        this.soundFiles.forEach((v)=>{
+            this.sounds[v].muted = false;
         });
     }
 
