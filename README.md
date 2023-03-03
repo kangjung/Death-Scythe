@@ -1,6 +1,9 @@
 # Death-Scythe
 ![image](https://github.com/kangjung/Death-Scythe/blob/master/playGif.gif?raw=true)<br/><br/>
-Play it now: https://js13kgames.com/entries/death-scythe<br/><br/>
+Play it now: <br/>
+https://js13kgames.com/entries/death-scythe<br/>
+https://kangjung.itch.io/death-scythe<br/>
+<br/>
 It's a kind of cross-scroll running Game.<br/>
 Move forward while hanging the rope.<br/>
 You need a soul to hang the rope.<br/>
